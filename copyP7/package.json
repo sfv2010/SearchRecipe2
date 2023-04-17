@@ -1,0 +1,26 @@
+{
+    "name": "les_petits_plats_p7",
+    "version": "1.0.0",
+    "description": "### Lien GitHub Pages: https://sfv2010.github.io/Les_Petits_Plats_P7/",
+    "main": "index.js",
+    "scripts": {
+        "lint": "eslint ."
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sfv2010/Les_Petits_Plats_P7.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/sfv2010/Les_Petits_Plats_P7/issues"
+    },
+    "homepage": "https://github.com/sfv2010/Les_Petits_Plats_P7#readme",
+    "devDependencies": {
+        "eslint": "^8.36.0",
+        "eslint-config-standard": "^17.0.0",
+        "eslint-plugin-import": "^2.27.5",
+        "eslint-plugin-n": "^15.6.1",
+        "eslint-plugin-promise": "^6.1.1"
+    }
+}

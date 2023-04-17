@@ -1,0 +1,235 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: auto 6%;
+    position: relative;
+}
+body,
+button,
+input {
+    font-family: "Lato", sans-serif;
+    border: none;
+    /* outline: none; */
+}
+header {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+h1 {
+    color: #d04f4f;
+    margin-top: 5px;
+    font-family: "DM Sans", sans-serif;
+}
+#search {
+    font-size: 18px;
+    width: 100%;
+    padding: 18px;
+    padding-right: 60px;
+    margin: 20px 0;
+    border-radius: 5px;
+    background-color: #e7e7e7;
+    background-image: url("assets/glass.svg");
+    background-repeat: no-repeat;
+    background-position: 98%;
+    background-size: 25px;
+}
+nav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 2;
+}
+.searchContainer {
+    display: flex;
+}
+button,
+.searchBox,
+.dropDownUl {
+    width: 170px;
+    height: 69px;
+    margin-right: 20px;
+    padding-left: 20px;
+    border-radius: 5px;
+    font-size: 18px;
+    color: #fff;
+    font-weight: 700;
+    text-align: left;
+}
+button {
+    background-image: url("assets/downChevron.svg");
+    background-repeat: no-repeat;
+    background-position: 90%;
+    background-size: 20px;
+    cursor: pointer;
+}
+.searchBox {
+    width: 667px;
+    border-radius: 5px 5px 0 0;
+}
+.searchBox::placeholder {
+    color: #e7e7e7;
+}
+.ingredients {
+    background-color: #3282f7;
+}
+.appliances {
+    background-color: #68d9a4;
+}
+.ustensiles {
+    background-color: #ed6454;
+}
+.dropDownUl {
+    width: 667px;
+    height: 100%;
+    padding: 20px;
+    font-weight: 400;
+    color: #fff;
+    border-radius: 0 0 5px 5px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.listRecipe {
+    width: 200px;
+    padding: 10px;
+    cursor: pointer;
+}
+.dropDownUl:after {
+    content: "";
+    display: block;
+    width: 200px;
+}
+.searchByKeyword {
+    position: relative;
+}
+.dropDown {
+    display: none;
+}
+.tagsContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.tag {
+    margin: 0px 10px 20px 0px;
+    padding: 10px 50px 10px 20px;
+    white-space: nowrap;
+    color: #fff;
+    border-radius: 5px;
+    background-image: url("assets/xmark.svg");
+    background-repeat: no-repeat;
+    background-position: 90%;
+    background-size: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.tag:hover {
+    background-image: url("assets/xmarkRed.svg");
+}
+
+.imgUp {
+    position: absolute;
+    right: 40px;
+    top: 10px;
+    width: 23px;
+    margin: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.imgUp:hover {
+    scale: 1.5;
+}
+
+/* --------------recipeFactory-------------- */
+main {
+    position: absolute;
+    top: 160%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+article {
+    max-width: 380px;
+    height: 364px;
+    background: #e7e7e7;
+    border-radius: 5px;
+    margin: 25px 0;
+}
+main:after {
+    content: "";
+    display: block;
+    width: 380px;
+}
+.imgRecipe {
+    height: 178px;
+    background: #c7bebe;
+    border-radius: 5px 5px 0 0;
+}
+.container,
+.box {
+    padding: 20px 20px 0;
+    display: flex;
+    justify-content: space-between;
+}
+.container {
+    align-items: center;
+}
+.box {
+    max-height: 106px;
+}
+h2,
+.quantity {
+    font-weight: 400;
+}
+h3,
+.ingredient {
+    font-weight: 700;
+}
+h2,
+h3 {
+    font-size: 18px;
+}
+h3 {
+    min-width: 85px;
+    max-height: 24px;
+    text-align: right;
+    background-image: url("assets/time.svg");
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: 20px;
+}
+p,
+ul {
+    font-size: 12px;
+    overflow: hidden;
+}
+p {
+    font-family: "roboto";
+    flex: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+}
+ul {
+    list-style-type: none;
+    flex: 1;
+    margin-right: 5px;
+}
+.hidden {
+    display: none;
+}
+.noFound {
+    margin-top: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #d04f4f;
+}
