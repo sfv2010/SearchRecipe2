@@ -24,7 +24,7 @@ export function keywordSearchFactory() {
             input.classList.add("searchBox");
             input.classList.add(className);
             input.id = `input${name}`;
-            input.type = "search";
+            input.type = "text";
             input.placeholder = `Rechercher un ${name}`;
             input.ariaLabel = `search with ${name}`;
 
@@ -147,7 +147,7 @@ export function keywordSearchFactory() {
         }
 
         function updateRecipe(newRecipeList) {
-            const ulList = document.querySelector(".dropDownUl");
+            const ulList = listCardDOM.querySelector(".dropDownUl");
             ulList.textContent = "";
             let sortDatalist = [...new Set(newRecipeList)].sort();
             capitalize(sortDatalist);
@@ -162,8 +162,8 @@ export function keywordSearchFactory() {
             const lists = listCardDOM.querySelectorAll(
                 `.listRecipe.${className}`
             );
+            //console.log(lists);
             lists.forEach((list) => {
-                console.log(list.textContent);
                 list.addEventListener("click", selectList);
                 list.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
