@@ -156,6 +156,7 @@ main {
     flex-wrap: wrap;
     justify-content: space-between;
     margin: 20px 0;
+    width: 100%;
 }
 article {
     max-width: 380px;
