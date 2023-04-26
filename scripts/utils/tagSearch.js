@@ -3,27 +3,7 @@ import { mainSearch } from "./mainSearch.js";
 
 // 1つのタグに合致するレシピデータを探して返す関数
 function findRecipesByTag(tag, recipes) {
-    //forEachにするとundifindeになる
     //引数として受け取ったrecipesをフィルターしてrecipe.ingredientsの中のitem.ingredientとtagに一致したものを新しい配列として返す。
-    const input = document.querySelector("#search");
-    // if (input.value) {
-    //     recipes = mainSearch(input.value);
-    //     console.log(input.value);
-    //     const result = recipes.filter((recipe) => {
-    //         return (
-    //             recipe.ingredients.find((item) => {
-    //                 return item.ingredient
-    //                     .toLowerCase()
-    //                     .includes(tag.toLowerCase());
-    //             }) ||
-    //             recipe.appliance.toLowerCase().includes(tag) ||
-    //             recipe.ustensils.find((ustensil) => {
-    //                 return ustensil.toLowerCase().includes(tag);
-    //             })
-    //         );
-    //     });
-    //     return result;
-    // } else {
     const result = recipes.filter((recipe) => {
         return (
             recipe.ingredients.find((item) => {
@@ -44,22 +24,27 @@ function findRecipesByTag(tag, recipes) {
 //  選択したタグをすべて持つレシピデータを返す関数
 export function tagSearch(searchTags) {
     const input = document.querySelector("#search");
-    if (input.value) {
-        let resultRecipes = mainSearch(input.value); // 初期値はinputに入力した結果
-        searchTags.forEach((tag) => {
-            // 結果をresultRecipesに入れる
-            resultRecipes = findRecipesByTag(tag, resultRecipes);
-        });
-        return resultRecipes;
-    } else {
-        let resultRecipes = recipes; // 初期値はすべてのレシピデータ
-        searchTags.forEach((tag) => {
-            // 結果をresultRecipesに入れる
-            resultRecipes = findRecipesByTag(tag, resultRecipes);
-        });
-        return resultRecipes;
-    }
+    // 初期値はすべてのレシピデータだが、もしmainインプット検索に値が入っており、それに基づいた検索結果がすでに表示されていれば、そのレシピを初期値にする。
+    const recipesToSearch = input.value ? mainSearch(input.value) : recipes;
+    let resultRecipes = recipesToSearch;
+    searchTags.forEach((tag) => {
+        // 結果をresultRecipesに入れる
+        resultRecipes = findRecipesByTag(tag, resultRecipes);
+    });
+    return resultRecipes;
+    // }
 }
+
+// export function tagSearch(searchTags) {
+//     const input = document.querySelector("#search");
+//     const recipesToSearch = input.value ? mainSearch(input.value) : recipes;
+
+//     const resultRecipes = searchTags.reduce((result, tag) => {
+//       return findRecipesByTag(tag, result);
+//     }, recipesToSearch);
+
+//     return resultRecipes;
+//   }
 
 // export function tagSearch(tagArray) {
 //     let itemArray = [];
