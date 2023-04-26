@@ -8,6 +8,7 @@ import {
 } from "./utils/recipeUtil.js";
 import { mainSearch } from "./utils/mainSearch.js";
 import { tagSearch } from "./utils/tagSearch.js";
+//mainのレシピデータ情報を表示する関数
 function displayMainData(recipes) {
     const main = document.querySelector("main");
     const noFound = document.createElement("div");
@@ -25,42 +26,57 @@ function displayMainData(recipes) {
         });
     }
 }
+//もしすでにタグインプットに入力されている文字があれば空にする関数
+function emptyInput() {
+    const inputByTags = document.querySelectorAll(".searchBox");
+    if (inputByTags) {
+        inputByTags.forEach((inputTag) => {
+            inputTag.value = "";
+        });
+    }
+}
 
-let keywordIngredient;
-let keywordAppliance;
-let keywordUstensile;
+//mainインプットバーによるサーチ機能結果を画面に表示する関数
 const input = document.querySelector("#search");
 input.addEventListener("keyup", function (e) {
     const searchInput = e.target.value.toLowerCase();
     const main = document.querySelector("main");
-    //const searchContainer = document.querySelector(".searchContainer");
-
     main.textContent = "";
-    //searchContainer.textContent = "";
 
-    if (searchInput.length >= 3) {
-        displayMainData(mainSearch(searchInput));
-        //displayKeywordSearch(mainSearch(searchInput));
-        console.log(keywordIngredient);
-        keywordIngredient.updateRecipe(
-            getIngredientList(mainSearch(searchInput))
-        );
-        keywordAppliance.updateRecipe(
-            getApplianceList(mainSearch(searchInput))
-        );
-        keywordUstensile.updateRecipe(
-            getUstensileList(mainSearch(searchInput))
-        );
-    } else {
-        // searchContainer.textContent = "";
-        displayMainData(recipes);
-        //displayKeywordSearch(recipes);
-        keywordIngredient.updateRecipe(getIngredientList(recipes));
-        keywordAppliance.updateRecipe(getApplianceList(recipes));
-        keywordUstensile.updateRecipe(getUstensileList(recipes));
+    //mainのインプットに文字を入力する時、すでにタグインプットに文字が入力されていたら削除する。
+    emptyInput();
+
+    //もしsearchinputに入力した文字が3文字以上の場合はmainSearchの結果を、それ以外はrecipeのデータを渡す
+    const searchResults =
+        searchInput.length >= 3 ? mainSearch(searchInput) : recipes;
+    //mainのレシピデータ表示
+    displayMainData(searchResults);
+
+    ////----
+    // const searchContainer = document.querySelector(".searchContainer");
+    // searchContainer.textContent = "";
+    // displayKeywordSearch(searchResults);
+    ////------------------------------------------------------------------
+
+    //オプション検索リストの表示
+    ////-----------------
+    const searchOptionsLists = [
+        { keyword: keywordIngredient, getList: getIngredientList },
+        { keyword: keywordAppliance, getList: getApplianceList },
+        { keyword: keywordUstensile, getList: getUstensileList },
+    ];
+    for (const option of searchOptionsLists) {
+        const list = option.getList(searchResults);
+        option.keyword.updateRecipe(list);
     }
+    ////------------------------------------------------------------------
 });
 
+//オプション検索リスト
+let keywordIngredient;
+let keywordAppliance;
+let keywordUstensile;
+//オプション検索リストを表示する関数
 function displayKeywordSearch(recipes) {
     const searchContainer = document.querySelector(".searchContainer");
     // keywordSearchFactory工場で作った機能をfactoryKeywordSearch変数へ代入
@@ -74,12 +90,12 @@ function displayKeywordSearch(recipes) {
         "Ingredients",
         getIngredientList(recipes)
     );
-    console.log(keywordIngredient);
+    //console.log(keywordIngredient);
     //createでreturnしたgetDOMを呼び、青色ボタンのDOMを製造。
     const keywordIngredientDOM = keywordIngredient.getDOM();
     searchContainer.appendChild(keywordIngredientDOM);
 
-    //ボタンを押したというdropDownOpen通知を受け取る。（keywordIngredientDOM＝<div className=""></div>searchByKeyword：大元のdiv）
+    //ボタンを押したというdropDownOpen通知を受け取る。（keywordIngredientDOM＝<div className="searchByKeyword"></div>：大元のdiv）
     keywordIngredientDOM.addEventListener("dropDownOpen", () => {
         keywordAppliance.closeDropDown();
         keywordUstensile.closeDropDown();
@@ -112,15 +128,57 @@ function displayKeywordSearch(recipes) {
         keywordAppliance.closeDropDown();
     });
 }
+//初期画面表示
 displayMainData(recipes);
 displayKeywordSearch(recipes);
 
-//リストを押したというselectList通知を受け取る
+//レシピのフィルタリングを行う関数
+function filterRecipesByTags() {
+    //リストの中からアイテムを選択すると同じアイテム名のタグが生成され、targetというクラス名が追加されるので、それを探してgetTargetTags配列に追加する。
+    const getTargetTags = [];
+    const targets = document.querySelectorAll(".target");
+    targets.forEach((target) => {
+        getTargetTags.push(target.textContent.toLowerCase());
+    });
+    const filterReciesBygetTag = tagSearch(getTargetTags);
+    //mainの表示レシピを一旦からにする。
+    const main = document.querySelector("main");
+    main.textContent = "";
+    displayMainData(filterReciesBygetTag);
+
+    keywordIngredient.updateRecipe(getIngredientList(filterReciesBygetTag));
+    keywordAppliance.updateRecipe(getApplianceList(filterReciesBygetTag));
+    keywordUstensile.updateRecipe(getUstensileList(filterReciesBygetTag));
+}
+//Create tag
+function createTag(className, searchByTag) {
+    const tagsContainer = document.querySelector(".tagsContainer");
+    const tagRecipe = document.createElement("span");
+    tagRecipe.classList.add("tag");
+    tagRecipe.textContent = searchByTag;
+    tagRecipe.tabIndex = "0";
+    tagRecipe.classList.add("target");
+    tagRecipe.classList.add(className);
+    tagsContainer.appendChild(tagRecipe);
+
+    tagRecipe.addEventListener("click", closeTag);
+    tagRecipe.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" || e.key === "Enter") {
+            closeTag(e);
+        }
+    });
+}
+//Close tag
+function closeTag(e) {
+    e.target.remove();
+    filterRecipesByTags();
+}
+
+//リストを押したというselectList通知を受け取ってタグを生成し、表示画面を切り替える
 const searchDivs = document.querySelectorAll(".searchByKeyword");
 searchDivs.forEach((searchDiv) => {
     searchDiv.addEventListener("selectList", (e) => {
         const searchByTag = e.detail.textContent;
-        //console.log(searchByTag);
         if (e.detail.classList.value === "listRecipe ingredients") {
             createTag("ingredients", searchByTag);
         } else if (e.detail.classList.value === "listRecipe appliances") {
@@ -128,75 +186,7 @@ searchDivs.forEach((searchDiv) => {
         } else if (e.detail.classList.value === "listRecipe ustensiles") {
             createTag("ustensiles", searchByTag);
         }
-        const getTargetTags = [];
-        const targets = document.querySelectorAll(".target");
-        targets.forEach((target) => {
-            getTargetTags.push(target.textContent.toLowerCase());
-        });
-        // console.log("getTargetTags", getTargetTags);
-        //console.log("searchByTag", searchByTag);
-        const main = document.querySelector("main");
-        main.textContent = "";
-        const inputByTags = document.querySelectorAll(".searchBox");
-        inputByTags.forEach((inputTag) => {
-            inputTag.value = "";
-        });
-
-        displayMainData(tagSearch(getTargetTags));
-
-        keywordIngredient.updateRecipe(
-            getIngredientList(tagSearch(getTargetTags))
-        );
-        keywordAppliance.updateRecipe(
-            getApplianceList(tagSearch(getTargetTags))
-        );
-        keywordUstensile.updateRecipe(
-            getUstensileList(tagSearch(getTargetTags))
-        );
+        emptyInput();
+        filterRecipesByTags();
     });
-
-    //Create tag
-    function createTag(className, searchByTag) {
-        const tagsContainer = document.querySelector(".tagsContainer");
-        const tagRecipe = document.createElement("span");
-        tagRecipe.classList.add("tag");
-        tagRecipe.textContent = searchByTag;
-        tagRecipe.tabIndex = "0";
-        tagRecipe.classList.add("target");
-        tagRecipe.classList.add(className);
-        tagsContainer.appendChild(tagRecipe);
-
-        tagRecipe.addEventListener("click", closeTag);
-        tagRecipe.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" || e.key === "Enter") {
-                closeTag(e);
-            }
-        });
-    }
-    //Close tag
-    function closeTag(e) {
-        e.target.remove();
-
-        const main = document.querySelector("main");
-
-        main.textContent = "";
-
-        const getTargetTags = [];
-        const targets = document.querySelectorAll(".target");
-        targets.forEach((target) => {
-            getTargetTags.push(target.textContent.toLowerCase());
-        });
-
-        displayMainData(tagSearch(getTargetTags));
-
-        keywordIngredient.updateRecipe(
-            getIngredientList(tagSearch(getTargetTags))
-        );
-        keywordAppliance.updateRecipe(
-            getApplianceList(tagSearch(getTargetTags))
-        );
-        keywordUstensile.updateRecipe(
-            getUstensileList(tagSearch(getTargetTags))
-        );
-    }
 });

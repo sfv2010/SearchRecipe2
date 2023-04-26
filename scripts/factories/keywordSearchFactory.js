@@ -46,7 +46,7 @@ export function keywordSearchFactory() {
             return searchByKeyword;
         }
 
-        function openList() {
+        function openDropDown() {
             const button = listCardDOM.querySelector(`.button${name}`);
             const dropDown = listCardDOM.querySelector(`#dropDown${name}`);
             //CustomEventで子供から親（window）へ”dropDownOpen”したよと通知を飛ばせるようにする
@@ -56,49 +56,82 @@ export function keywordSearchFactory() {
             //dispatchEventでボタンを押して開いたらdropDownOpenEvent通知を飛ばせるように発生させる
             listCardDOM.dispatchEvent(dropDownOpenEvent);
         }
-        function closeList() {
+        function closeDropDown() {
             const button = listCardDOM.querySelector(`.button${name}`);
             const dropDown = listCardDOM.querySelector(`#dropDown${name}`);
             button.style.display = "block";
             dropDown.style.display = "none";
         }
+        //ボタンの開け閉めを管理する関数
+        //8行目でlistCardDOMという変数にDOM要素が代入されているので、それを引数として渡している。
+        //関数内では、引数として受け取ったDOM要素を利用して、イベントリスナーを設定するために使用。
         function setOpenCloseList() {
             const button = listCardDOM.querySelector(`.button${name}`);
             const imgUp = listCardDOM.querySelector(`#imgUp${name}`);
             if (button) {
-                button.addEventListener("click", () => openList());
+                button.addEventListener("click", () => openDropDown());
             }
             if (imgUp) {
-                imgUp.addEventListener("click", () => closeList());
+                imgUp.addEventListener("click", () => closeDropDown());
                 imgUp.addEventListener("keydown", (e) => {
                     if (e.key === "Escape" || e.key === "Enter") {
-                        closeList(e);
+                        closeDropDown(e);
                     }
                 });
             }
         }
-        //各ボタンを押すと表示されるリストを作成
+        //最初の文字を大文字にする関数
         function capitalize(array) {
             for (let i = 0; i < array.length; i++) {
                 array[i] = array[i].charAt(0).toUpperCase() + array[i].slice(1);
             }
         }
+
+        //リストのそれぞれのアイテムを作成する関数
+        function createListElement(className, textContent) {
+            const listElement = document.createElement("li");
+            listElement.classList.add("listRecipe");
+            listElement.classList.add(className);
+            listElement.textContent = textContent;
+            listElement.tabIndex = "0";
+            return listElement;
+        }
+        //各ボタンを押すと表示されるリストを作成する関数
         function getDataList(name, className, dataList) {
             const ulList = document.createElement("ul");
             ulList.classList.add("dropDownUl");
             ulList.classList.add(className);
             ulList.classList.add(`ul${name}`);
-            let sortDatalist = [...new Set(dataList)].sort();
-            capitalize(sortDatalist);
-            sortDatalist.forEach((data) => {
-                const listRecipe = document.createElement("li");
-                listRecipe.classList.add("listRecipe");
-                listRecipe.classList.add(className);
-                listRecipe.textContent = data;
-                listRecipe.tabIndex = "0";
-                ulList.appendChild(listRecipe);
+            let sortedDataList = [...new Set(dataList)].sort();
+            capitalize(sortedDataList);
+            sortedDataList.forEach((data) => {
+                const listElement = createListElement(className, data);
+                ulList.appendChild(listElement);
             });
             return ulList;
+        }
+        //表示されるリストアイテムを更新する関数
+        function updateRecipe(newRecipeList) {
+            const ulList = listCardDOM.querySelector(".dropDownUl");
+            ulList.textContent = "";
+            let sortedDataList = [...new Set(newRecipeList)].sort();
+            capitalize(sortedDataList);
+            sortedDataList.forEach((data) => {
+                const listElement = createListElement(className, data);
+                ulList.appendChild(listElement);
+            });
+            const lists = listCardDOM.querySelectorAll(
+                `.listRecipe.${className}`
+            );
+
+            lists.forEach((list) => {
+                list.addEventListener("click", selectList);
+                list.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        selectList(e);
+                    }
+                });
+            });
         }
         //リスト一覧からアイテムを選択
         function selectList(e) {
@@ -118,14 +151,11 @@ export function keywordSearchFactory() {
             });
         });
 
-        //各ボタンのinput入力から検索
-        const listName = {
-            input: listCardDOM.querySelector(`#input${name}`),
-            object: listCardDOM.querySelectorAll(`.listRecipe.${className}`),
-        };
+        //各タグリストのinput入力から検索
+        const inputTag = listCardDOM.querySelector(`#input${name}`);
         function findInput(e, lists) {
             const searchInput = e.target.value;
-            lists.object.forEach((list) => {
+            lists.forEach((list) => {
                 if (
                     list.textContent
                         .toLowerCase()
@@ -137,43 +167,36 @@ export function keywordSearchFactory() {
                 }
             });
         }
-        listName.input.addEventListener("keyup", function (e) {
-            findInput(e, listName);
+        inputTag.addEventListener("keyup", function (e) {
+            findInput(
+                e,
+                listCardDOM.querySelectorAll(`.listRecipe.${className}`)
+            );
         });
+        //<MEMO>objectとしてキーで取り出すと初期ページの時のみ作動するが、検索した後は再度使えない。
+        // const listName = {
+        // input:listCardDOM.querySelector(`#input${name}`);
+        //     object: listCardDOM.querySelectorAll(`.listRecipe.${className}`),イベントの外で定義してるので初期値は変わらない
+        // };
+        // listName.input.addEventListener("keyup", function (e) {
+        //     findInput(e, listName.object);
+        //     // findInput(
+        //     //     e,
+        //     //     listCardDOM.querySelectorAll(`.listRecipe.${className}`)
+        //     // );
+        //     console.log(listName.object);
+        // });
+        //この書き方では、ListIngredientsには!!!当初に取得された要素で、後に追加された要素に更新されない!!!
+        //そのため、findInput()が後に追加された要素に対しては機能しない.
+        //よって、イベントの中でイベントが呼ばれるたびに定義しないといけない。
 
         // 工場ですでに作ってあるlistCardDOMを渡すためにreturnする。
         function getDOM() {
             return listCardDOM;
         }
 
-        function updateRecipe(newRecipeList) {
-            const ulList = listCardDOM.querySelector(".dropDownUl");
-            ulList.textContent = "";
-            let sortDatalist = [...new Set(newRecipeList)].sort();
-            capitalize(sortDatalist);
-            sortDatalist.forEach((data) => {
-                const listRecipe = document.createElement("li");
-                listRecipe.classList.add("listRecipe");
-                listRecipe.classList.add(className);
-                listRecipe.textContent = data;
-                listRecipe.tabIndex = "0";
-                ulList.appendChild(listRecipe);
-            });
-            const lists = listCardDOM.querySelectorAll(
-                `.listRecipe.${className}`
-            );
-            //console.log(lists);
-            lists.forEach((list) => {
-                list.addEventListener("click", selectList);
-                list.addEventListener("keydown", (e) => {
-                    if (e.key === "Enter") {
-                        selectList(e);
-                    }
-                });
-            });
-        }
         //createのreturn
-        return { getDOM, closeDropDown: closeList, updateRecipe };
+        return { getDOM, closeDropDown, updateRecipe };
     }
     return { create };
 }
